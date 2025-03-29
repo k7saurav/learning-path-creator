@@ -5,7 +5,11 @@ import Hero from '@/components/Hero';
 import LearningGoalForm from '@/components/LearningGoalForm';
 import LearningPath, { LearningModule } from '@/components/LearningPath';
 import { toast } from '@/components/ui/use-toast';
-import { generateLearningPathWithAI, LearningPath as LearningPathType } from '@/lib/gemini';
+import { 
+  generateLearningPathWithAI, 
+  generateFallbackLearningPath,
+  LearningPath as LearningPathType 
+} from '@/lib/gemini';
 
 const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -18,7 +22,22 @@ const Index = () => {
   }) => {
     try {
       setIsGenerating(true);
-      const generatedPath = await generateLearningPathWithAI(data);
+      let generatedPath;
+      
+      try {
+        // Try with the AI first
+        generatedPath = await generateLearningPathWithAI(data);
+      } catch (apiError) {
+        console.error("API Error, using fallback:", apiError);
+        // If the API fails, use the fallback generator
+        generatedPath = generateFallbackLearningPath(data);
+        toast({
+          title: "Using offline mode",
+          description: "We couldn't connect to our AI. Using a basic learning path instead.",
+          variant: "destructive",
+        });
+      }
+      
       setLearningPath(generatedPath);
       toast({
         title: "Learning path created!",

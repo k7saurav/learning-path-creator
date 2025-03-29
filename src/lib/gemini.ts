@@ -3,7 +3,8 @@
 import { toast } from "@/components/ui/use-toast";
 
 const GEMINI_API_KEY = "AIzaSyDv550bKhRfnZkVHXhEMnpRNvTFXBSBrxI";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+// Updated API URL to use the correct endpoint format
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent";
 
 export type LearningResource = {
   type: 'video' | 'article' | 'course';
@@ -64,7 +65,7 @@ export async function generateLearningPathWithAI(data: LearningGoalData): Promis
       Adjust the estimated hours based on the time availability.
     `;
 
-    // Make API request to Gemini
+    // Make API request to Gemini with updated request format
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
@@ -80,8 +81,6 @@ export async function generateLearningPathWithAI(data: LearningGoalData): Promis
         ],
         generationConfig: {
           temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
           maxOutputTokens: 2048,
         }
       })
@@ -95,8 +94,11 @@ export async function generateLearningPathWithAI(data: LearningGoalData): Promis
 
     const responseData = await response.json();
     
-    // Extract the text from the Gemini response
+    // Extract the text from the Gemini response - updated for the v1 API structure
     const generatedText = responseData.candidates[0].content.parts[0].text;
+    
+    // For debugging
+    console.log("Generated response:", generatedText);
     
     // Find the JSON object in the text
     const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
@@ -122,4 +124,74 @@ export async function generateLearningPathWithAI(data: LearningGoalData): Promis
     console.error("Error generating learning path:", error);
     throw error;
   }
+}
+
+// Fallback function if API fails
+export function generateFallbackLearningPath(data: LearningGoalData): LearningPath {
+  // Generate a basic fallback learning path
+  const fallbackPath: LearningPath = {
+    title: `${data.goal} Learning Path`,
+    description: `A learning path for ${data.goal} tailored for ${data.skillLevel} level with ${data.timeAvailability} time availability.`,
+    modules: [
+      {
+        id: "module_1",
+        title: "Getting Started",
+        description: "Introduction to the fundamentals.",
+        status: "not-started",
+        estimatedHours: data.timeAvailability === 'low' ? 2 : (data.timeAvailability === 'medium' ? 4 : 6),
+        resources: [
+          {
+            type: "article",
+            title: "Introduction Guide",
+            url: "https://example.com/intro-guide"
+          },
+          {
+            type: "video",
+            title: "Beginner Tutorial",
+            url: "https://example.com/beginner-tutorial"
+          }
+        ]
+      },
+      {
+        id: "module_2",
+        title: "Core Concepts",
+        description: "Essential principles and ideas.",
+        status: "not-started",
+        estimatedHours: data.timeAvailability === 'low' ? 3 : (data.timeAvailability === 'medium' ? 5 : 8),
+        resources: [
+          {
+            type: "course",
+            title: "Core Principles Course",
+            url: "https://example.com/core-course"
+          },
+          {
+            type: "article",
+            title: "Best Practices Guide",
+            url: "https://example.com/best-practices"
+          }
+        ]
+      },
+      {
+        id: "module_3",
+        title: "Advanced Topics",
+        description: "Taking your skills to the next level.",
+        status: "not-started",
+        estimatedHours: data.timeAvailability === 'low' ? 3 : (data.timeAvailability === 'medium' ? 6 : 10),
+        resources: [
+          {
+            type: "video",
+            title: "Advanced Techniques",
+            url: "https://example.com/advanced-techniques"
+          },
+          {
+            type: "article",
+            title: "Expert Tips and Tricks",
+            url: "https://example.com/expert-tips"
+          }
+        ]
+      }
+    ]
+  };
+  
+  return fallbackPath;
 }
