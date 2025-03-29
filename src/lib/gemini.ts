@@ -22,9 +22,12 @@ export type LearningModule = {
 };
 
 export type LearningPath = {
+  id?: string;
   title: string;
   description: string;
   modules: LearningModule[];
+  created_at?: string;
+  user_id?: string;
 };
 
 export type LearningGoalData = {

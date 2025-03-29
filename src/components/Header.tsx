@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Sparkles, LogOut, User } from 'lucide-react';
+import { Sparkles, LogOut, User, Folder } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -29,16 +29,29 @@ const Header: React.FC = () => {
     navigate('/auth');
   };
 
+  const handleMyPathsClick = () => {
+    navigate('/my-paths');
+  };
+
   return (
     <header className="border-b sticky top-0 bg-background z-10">
       <div className="container mx-auto flex justify-between items-center py-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
           <Sparkles className="h-6 w-6 text-brand-purple" />
           <h1 className="text-xl font-bold">Learning Path Creator</h1>
         </div>
 
         {user ? (
           <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              onClick={handleMyPathsClick}
+              className="gap-2"
+            >
+              <Folder className="h-4 w-4" />
+              <span className="hidden sm:inline">My Paths</span>
+            </Button>
+            
             <span className="text-sm text-muted-foreground hidden md:inline-block">
               {user.email}
             </span>
@@ -49,6 +62,10 @@ const Header: React.FC = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleMyPathsClick}>
+                  <Folder className="mr-2 h-4 w-4" />
+                  <span>My Paths</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign out</span>
