@@ -4,13 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import MyPaths from '@/components/MyPaths';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUserLearningPaths, deleteLearningPath } from '@/lib/learningPathService';
+import { getUserLearningPaths, deleteLearningPath, setupSupabaseRPC } from '@/lib/learningPathService';
 import { LearningPath as LearningPathType } from '@/lib/gemini';
 import { toast } from '@/components/ui/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ExclamationTriangleIcon } from 'lucide-react';
 
 const MyPathsPage: React.FC = () => {
   const [paths, setPaths] = useState<LearningPathType[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [databaseError, setDatabaseError] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -22,20 +25,37 @@ const MyPathsPage: React.FC = () => {
     if (!user) return;
     
     setIsLoading(true);
-    const { data, error } = await getUserLearningPaths(user.id);
+    setDatabaseError(false);
     
-    if (error) {
+    try {
+      // Try to set up the database if needed
+      await setupSupabaseRPC();
+      
+      const { data, error } = await getUserLearningPaths(user.id);
+      
+      if (error) {
+        console.error(error);
+        if (error.code === '42P01') {
+          setDatabaseError(true);
+        }
+        toast({
+          title: 'Error',
+          description: 'Failed to load your learning paths',
+          variant: 'destructive',
+        });
+      } else {
+        setPaths(data);
+      }
+    } catch (error) {
+      console.error("Error in fetchPaths:", error);
       toast({
         title: 'Error',
         description: 'Failed to load your learning paths',
         variant: 'destructive',
       });
-      console.error(error);
-    } else {
-      setPaths(data);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleSelectPath = (path: LearningPathType) => {
@@ -43,21 +63,25 @@ const MyPathsPage: React.FC = () => {
   };
 
   const handleDeletePath = async (pathId: string) => {
-    const { error } = await deleteLearningPath(pathId);
-    
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete the learning path',
-        variant: 'destructive',
-      });
-      throw error;
-    } else {
-      toast({
-        title: 'Success',
-        description: 'Learning path deleted successfully',
-      });
-      fetchPaths();
+    try {
+      const { error } = await deleteLearningPath(pathId);
+      
+      if (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete the learning path',
+          variant: 'destructive',
+        });
+        throw error;
+      } else {
+        toast({
+          title: 'Success',
+          description: 'Learning path deleted successfully',
+        });
+        fetchPaths();
+      }
+    } catch (error) {
+      console.error("Error in handleDeletePath:", error);
     }
   };
 
@@ -66,6 +90,17 @@ const MyPathsPage: React.FC = () => {
       <Header />
       
       <main className="flex-1">
+        {databaseError && (
+          <Alert variant="destructive" className="max-w-3xl mx-auto my-4">
+            <ExclamationTriangleIcon className="h-4 w-4" />
+            <AlertTitle>Database Setup Required</AlertTitle>
+            <AlertDescription>
+              The learning_paths table doesn't exist in your Supabase database. Please go to your Supabase 
+              dashboard and create this table or contact your administrator.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <MyPaths 
           paths={paths} 
           onSelectPath={handleSelectPath}
