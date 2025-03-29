@@ -6,16 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { LearningGoalData } from '@/lib/gemini';
 
 type LearningGoalFormProps = {
   onSubmit: (data: LearningGoalData) => void;
   isLoading?: boolean;
-};
-
-export type LearningGoalData = {
-  goal: string;
-  skillLevel: string;
-  timeAvailability: string;
 };
 
 const LearningGoalForm: React.FC<LearningGoalFormProps> = ({ onSubmit, isLoading = false }) => {
@@ -95,7 +90,7 @@ const LearningGoalForm: React.FC<LearningGoalFormProps> = ({ onSubmit, isLoading
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
+                Generating AI Learning Path...
               </>
             ) : (
               'Generate Learning Path'

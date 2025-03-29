@@ -5,87 +5,11 @@ import Hero from '@/components/Hero';
 import LearningGoalForm from '@/components/LearningGoalForm';
 import LearningPath, { LearningModule } from '@/components/LearningPath';
 import { toast } from '@/components/ui/use-toast';
-
-// Mock data service - simulating API call
-const generateLearningPath = async (goal: string, skillLevel: string, timeAvailability: string) => {
-  // Simulate API call delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  
-  // This would be replaced by a real API call in production
-  const modules: LearningModule[] = [
-    {
-      id: "1",
-      title: `${goal} Fundamentals`,
-      description: `Learn the core concepts of ${goal} suitable for a ${skillLevel} level learner.`,
-      status: "not-started",
-      estimatedHours: timeAvailability === 'low' ? 2 : timeAvailability === 'medium' ? 4 : 6,
-      resources: [
-        {
-          type: "video",
-          title: `Introduction to ${goal}`,
-          url: "https://example.com/intro",
-        },
-        {
-          type: "article",
-          title: "Getting Started Guide",
-          url: "https://example.com/guide",
-        },
-      ],
-    },
-    {
-      id: "2",
-      title: `${goal} Practical Application`,
-      description: "Apply what you've learned in real-world scenarios.",
-      status: "not-started",
-      estimatedHours: timeAvailability === 'low' ? 3 : timeAvailability === 'medium' ? 5 : 8,
-      resources: [
-        {
-          type: "course",
-          title: "Hands-on Workshop",
-          url: "https://example.com/workshop",
-        },
-        {
-          type: "video",
-          title: "Step-by-Step Tutorial",
-          url: "https://example.com/tutorial",
-        },
-      ],
-    },
-    {
-      id: "3",
-      title: "Advanced Techniques",
-      description: "Master advanced concepts and specialized knowledge.",
-      status: "not-started",
-      estimatedHours: timeAvailability === 'low' ? 4 : timeAvailability === 'medium' ? 7 : 10,
-      resources: [
-        {
-          type: "article",
-          title: "Expert Guidelines",
-          url: "https://example.com/expert",
-        },
-        {
-          type: "course",
-          title: "Masterclass",
-          url: "https://example.com/masterclass",
-        },
-      ],
-    },
-  ];
-
-  return {
-    title: `Your ${goal} Learning Journey`,
-    description: `A personalized learning path for ${skillLevel} level students with ${timeAvailability} time availability.`,
-    modules,
-  };
-};
+import { generateLearningPathWithAI, LearningPath as LearningPathType } from '@/lib/gemini';
 
 const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [learningPath, setLearningPath] = useState<{
-    title: string;
-    description: string;
-    modules: LearningModule[];
-  } | null>(null);
+  const [learningPath, setLearningPath] = useState<LearningPathType | null>(null);
 
   const handleGoalSubmit = async (data: {
     goal: string;
@@ -94,11 +18,7 @@ const Index = () => {
   }) => {
     try {
       setIsGenerating(true);
-      const generatedPath = await generateLearningPath(
-        data.goal,
-        data.skillLevel,
-        data.timeAvailability
-      );
+      const generatedPath = await generateLearningPathWithAI(data);
       setLearningPath(generatedPath);
       toast({
         title: "Learning path created!",
