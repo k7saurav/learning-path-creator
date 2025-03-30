@@ -193,6 +193,8 @@ const Index = () => {
               description={learningPath.description}
               modules={learningPath.modules}
               onModuleStatusChange={handleModuleStatusChange}
+              isSaved={isPathSaved}
+              pathId={learningPath.id}
             />
           </section>
         )}

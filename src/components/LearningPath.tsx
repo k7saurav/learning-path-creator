@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, CircleEllipsis, Circle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,8 @@ type LearningPathProps = {
   description: string;
   modules: LearningModule[];
   onModuleStatusChange: (moduleId: string, status: LearningModule['status']) => void;
+  isSaved?: boolean; // New prop to determine if the path is saved
+  pathId?: string; // Path ID for local storage key
 };
 
 const StatusIcon = ({ status }: { status: LearningModule['status'] }) => {
@@ -54,7 +56,43 @@ const LearningPath: React.FC<LearningPathProps> = ({
   description,
   modules,
   onModuleStatusChange,
+  isSaved = false,
+  pathId = '',
 }) => {
+  // Load module statuses from local storage on component mount
+  useEffect(() => {
+    if (isSaved && pathId) {
+      const storageKey = `learning-path-${pathId}`;
+      const savedStatuses = localStorage.getItem(storageKey);
+      
+      if (savedStatuses) {
+        try {
+          const statusData = JSON.parse(savedStatuses);
+          // Update each module's status from local storage
+          for (const [moduleId, status] of Object.entries(statusData)) {
+            onModuleStatusChange(moduleId, status as LearningModule['status']);
+          }
+        } catch (error) {
+          console.error('Error loading module statuses from local storage:', error);
+        }
+      }
+    }
+  }, [isSaved, pathId, onModuleStatusChange]);
+
+  // Save module statuses to local storage when they change
+  useEffect(() => {
+    if (isSaved && pathId) {
+      const storageKey = `learning-path-${pathId}`;
+      const statusData: Record<string, LearningModule['status']> = {};
+      
+      modules.forEach(module => {
+        statusData[module.id] = module.status;
+      });
+      
+      localStorage.setItem(storageKey, JSON.stringify(statusData));
+    }
+  }, [modules, isSaved, pathId]);
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center max-w-3xl mx-auto mb-8">
@@ -75,29 +113,32 @@ const LearningPath: React.FC<LearningPathProps> = ({
                   Estimated time: {module.estimatedHours} hours
                 </CardDescription>
               </div>
-              <div className="space-x-2">
-                <Button
-                  variant={module.status === 'not-started' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onModuleStatusChange(module.id, 'not-started')}
-                >
-                  Not Started
-                </Button>
-                <Button
-                  variant={module.status === 'in-progress' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onModuleStatusChange(module.id, 'in-progress')}
-                >
-                  In Progress
-                </Button>
-                <Button
-                  variant={module.status === 'completed' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onModuleStatusChange(module.id, 'completed')}
-                >
-                  Completed
-                </Button>
-              </div>
+              {/* Only show status buttons for saved paths */}
+              {isSaved && (
+                <div className="space-x-2">
+                  <Button
+                    variant={module.status === 'not-started' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onModuleStatusChange(module.id, 'not-started')}
+                  >
+                    Not Started
+                  </Button>
+                  <Button
+                    variant={module.status === 'in-progress' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onModuleStatusChange(module.id, 'in-progress')}
+                  >
+                    In Progress
+                  </Button>
+                  <Button
+                    variant={module.status === 'completed' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onModuleStatusChange(module.id, 'completed')}
+                  >
+                    Completed
+                  </Button>
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <p className="mb-4">{module.description}</p>

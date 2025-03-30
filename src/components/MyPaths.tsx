@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Folder, Trash2 } from 'lucide-react';
@@ -62,6 +61,15 @@ const MyPaths: React.FC<MyPathsProps> = ({
     }
   };
 
+  const handleSelectPath = (path: LearningPathType) => {
+    // Mark the path as a saved path
+    const pathWithSavedFlag = {
+      ...path,
+      isSaved: true
+    };
+    onSelectPath(pathWithSavedFlag);
+  };
+
   if (isLoading) {
     return (
       <div className="py-8 text-center">
@@ -93,7 +101,7 @@ const MyPaths: React.FC<MyPathsProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onSelectPath(path)}
+                  onClick={() => handleSelectPath(path)}
                 >
                   <Folder className="mr-2 h-4 w-4" />
                   Open
