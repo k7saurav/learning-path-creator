@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { LearningPath } from '@/lib/gemini';
 import { toast } from '@/components/ui/use-toast';
@@ -7,18 +6,12 @@ import { toast } from '@/components/ui/use-toast';
 export async function ensureLearningPathsTable() {
   try {
     // Check if the table exists
-    const { error: checkError } = await supabase
+    let { error: checkError } = await supabase
       .from('learning_paths')
       .select('id')
-      .limit(1)
-      .catch(err => {
-        // If we get an error about the table not existing, we'll create it
-        if (err && err.code === '42P01') {
-          return { error: err };
-        }
-        throw err;
-      });
-
+      .limit(1);
+    
+    // If we get an error about the table not existing, we'll create it
     if (checkError && checkError.code === '42P01') {
       console.log('learning_paths table does not exist, creating it...');
       

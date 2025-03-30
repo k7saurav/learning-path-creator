@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -8,7 +7,7 @@ import { getUserLearningPaths, deleteLearningPath, setupSupabaseRPC } from '@/li
 import { LearningPath as LearningPathType } from '@/lib/gemini';
 import { toast } from '@/components/ui/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ExclamationTriangleIcon } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 const MyPathsPage: React.FC = () => {
   const [paths, setPaths] = useState<LearningPathType[] | null>(null);
@@ -28,7 +27,6 @@ const MyPathsPage: React.FC = () => {
     setDatabaseError(false);
     
     try {
-      // Try to set up the database if needed
       await setupSupabaseRPC();
       
       const { data, error } = await getUserLearningPaths(user.id);
@@ -92,7 +90,7 @@ const MyPathsPage: React.FC = () => {
       <main className="flex-1">
         {databaseError && (
           <Alert variant="destructive" className="max-w-3xl mx-auto my-4">
-            <ExclamationTriangleIcon className="h-4 w-4" />
+            <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Database Setup Required</AlertTitle>
             <AlertDescription>
               The learning_paths table doesn't exist in your Supabase database. Please go to your Supabase 
