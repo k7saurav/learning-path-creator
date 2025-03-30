@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -33,6 +34,7 @@ const MyPathsPage: React.FC = () => {
       
       if (error) {
         console.error(error);
+        // Only set database error if it's specifically a table not found error
         if (error.code === '42P01') {
           setDatabaseError(true);
         }
@@ -42,6 +44,8 @@ const MyPathsPage: React.FC = () => {
           variant: 'destructive',
         });
       } else {
+        // If we successfully get data, make sure database error is false
+        setDatabaseError(false);
         setPaths(data);
       }
     } catch (error) {

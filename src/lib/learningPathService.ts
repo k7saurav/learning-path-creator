@@ -5,11 +5,17 @@ import { toast } from '@/components/ui/use-toast';
 // Check if learning_paths table exists and create it if it doesn't
 export async function ensureLearningPathsTable() {
   try {
-    // Check if the table exists
-    let { error: checkError } = await supabase
+    // Check if the table exists by trying to query it
+    let { data, error: checkError } = await supabase
       .from('learning_paths')
       .select('id')
       .limit(1);
+    
+    // If data is not null, the table exists
+    if (data !== null) {
+      console.log('learning_paths table exists');
+      return { error: null };
+    }
     
     // If we get an error about the table not existing, we'll create it
     if (checkError && checkError.code === '42P01') {
@@ -106,9 +112,21 @@ export async function deleteLearningPath(pathId: string) {
   }
 }
 
-// Function to set up RPC functions in Supabase
+// Modify the setupSupabaseRPC function to handle the case where the table already exists
 export async function setupSupabaseRPC() {
   try {
+    // First, check if the table already exists
+    let { data } = await supabase
+      .from('learning_paths')
+      .select('id')
+      .limit(1);
+    
+    // If we can query the table, it exists and we don't need to do anything
+    if (data !== null) {
+      console.log('learning_paths table already exists, no setup needed');
+      return { error: null };
+    }
+    
     // Create RPC function for table creation
     const createFunctionSQL = `
       CREATE OR REPLACE FUNCTION create_rpc_function_for_table()
@@ -172,11 +190,6 @@ export async function setupSupabaseRPC() {
     if (error) {
       // If we can't create the function using RPC, we'll inform the user
       console.error('Error creating RPC setup function:', error);
-      toast({
-        title: "Database Setup Required",
-        description: "Please set up the learning_paths table in your Supabase dashboard.",
-        variant: "destructive",
-      });
       return { error };
     }
     
@@ -185,11 +198,6 @@ export async function setupSupabaseRPC() {
     
     if (rpcError) {
       console.error('Error executing RPC setup function:', rpcError);
-      toast({
-        title: "Database Setup Required",
-        description: "Please set up the learning_paths table in your Supabase dashboard.",
-        variant: "destructive",
-      });
       return { error: rpcError };
     }
     
@@ -198,22 +206,12 @@ export async function setupSupabaseRPC() {
     
     if (tableError) {
       console.error('Error creating learning_paths table:', tableError);
-      toast({
-        title: "Database Setup Required",
-        description: "Please set up the learning_paths table in your Supabase dashboard.",
-        variant: "destructive",
-      });
       return { error: tableError };
     }
     
     return { error: null };
   } catch (error) {
     console.error('Error setting up Supabase RPC:', error);
-    toast({
-      title: "Database Setup Required",
-      description: "Please set up the learning_paths table manually in your Supabase dashboard.",
-      variant: "destructive",
-    });
     return { error };
   }
 }
