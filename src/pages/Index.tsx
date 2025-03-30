@@ -144,11 +144,11 @@ const Index = () => {
     navigate('/my-paths');
   };
 
-  // Render the dashboard content for authenticated users
+  // Render the dashboard content for authenticated users at /dashboard path
   const renderDashboardContent = () => {
     return (
       <>
-        {/* Learning Goal Form - Only show when no learning path is generated */}
+        {/* Learning Goal Form - show when no learning path is generated */}
         {!learningPath && (
           <section id="learning-goal-form" className="py-16 container">
             <LearningGoalForm onSubmit={handleGoalSubmit} isLoading={isGenerating} />
@@ -211,7 +211,10 @@ const Index = () => {
         )}
         
         {/* For authenticated users on the dashboard, show the dashboard content */}
-        {user && (location.pathname === '/dashboard' || learningPath) && renderDashboardContent()}
+        {(location.pathname === '/dashboard') && renderDashboardContent()}
+        
+        {/* For viewing a path on the index page after authentication */}
+        {user && location.pathname === '/' && learningPath && renderDashboardContent()}
       </main>
       
       {/* Footer */}
