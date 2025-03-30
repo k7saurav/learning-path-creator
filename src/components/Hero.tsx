@@ -2,8 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Hero: React.FC<{ onGetStarted: () => void }> = ({ onGetStarted }) => {
+  const { user } = useAuth();
+  
   return (
     <div className="py-16 md:py-24 text-center max-w-4xl mx-auto px-4">
       <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -13,7 +16,7 @@ const Hero: React.FC<{ onGetStarted: () => void }> = ({ onGetStarted }) => {
         Create custom learning paths tailored to your goals, skill level, and available time
       </p>
       <Button size="lg" onClick={onGetStarted} className="gap-2">
-        Create Your Path <ArrowRight className="h-4 w-4" />
+        {user ? 'Create Your Path' : 'Sign Up to Get Your Path'} <ArrowRight className="h-4 w-4" />
       </Button>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">

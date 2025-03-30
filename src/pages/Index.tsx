@@ -26,13 +26,19 @@ const Index = () => {
   
   // Check if we have a selected path from My Paths
   useEffect(() => {
+    // Redirect authenticated users to dashboard when coming to the index page directly
+    if (user && location.pathname === '/' && !location.state?.selectedPath) {
+      navigate('/dashboard');
+      return;
+    }
+    
     if (location.state?.selectedPath) {
       setLearningPath(location.state.selectedPath);
       setIsPathSaved(true);
       // Clear the location state to avoid loading the same path on refresh
       window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.state, user, navigate, location.pathname]);
 
   const handleGoalSubmit = async (data: {
     goal: string;
@@ -123,6 +129,11 @@ const Index = () => {
   };
 
   const handleGetStarted = () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
     const formElement = document.getElementById('learning-goal-form');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
@@ -133,14 +144,10 @@ const Index = () => {
     navigate('/my-paths');
   };
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1">
-        {/* Hero Section - Only show when no learning path is generated */}
-        {!learningPath && <Hero onGetStarted={handleGetStarted} />}
-        
+  // Render the dashboard content for authenticated users
+  const renderDashboardContent = () => {
+    return (
+      <>
         {/* Learning Goal Form - Only show when no learning path is generated */}
         {!learningPath && (
           <section id="learning-goal-form" className="py-16 container">
@@ -189,6 +196,22 @@ const Index = () => {
             />
           </section>
         )}
+      </>
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1">
+        {/* For non-authenticated users or on the landing page, show the Hero section */}
+        {(!user || location.pathname === '/') && !learningPath && (
+          <Hero onGetStarted={handleGetStarted} />
+        )}
+        
+        {/* For authenticated users on the dashboard, show the dashboard content */}
+        {user && (location.pathname === '/dashboard' || learningPath) && renderDashboardContent()}
       </main>
       
       {/* Footer */}

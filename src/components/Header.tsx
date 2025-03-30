@@ -22,7 +22,7 @@ const Header: React.FC = () => {
       title: 'Signed out',
       description: 'You have been successfully signed out.',
     });
-    navigate('/auth');
+    navigate('/');
   };
 
   const handleAuthClick = () => {
@@ -32,17 +32,37 @@ const Header: React.FC = () => {
   const handleMyPathsClick = () => {
     navigate('/my-paths');
   };
+  
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+  
+  const handleDashboardClick = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
     <header className="border-b sticky top-0 bg-background z-10">
       <div className="container mx-auto flex justify-between items-center py-4">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+        <div className="flex items-center gap-2 cursor-pointer" onClick={handleLogoClick}>
           <Sparkles className="h-6 w-6 text-brand-purple" />
           <h1 className="text-xl font-bold">Learning Path Creator</h1>
         </div>
 
         {user ? (
           <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              onClick={handleDashboardClick}
+              className="gap-2"
+            >
+              Dashboard
+            </Button>
+            
             <Button 
               variant="outline" 
               onClick={handleMyPathsClick}
@@ -76,7 +96,7 @@ const Header: React.FC = () => {
         ) : (
           <div className="flex gap-4">
             <Button variant="outline" onClick={handleAuthClick}>Sign In</Button>
-            <Button onClick={handleAuthClick}>Get Started</Button>
+            <Button onClick={handleAuthClick}>Sign Up</Button>
           </div>
         )}
       </div>

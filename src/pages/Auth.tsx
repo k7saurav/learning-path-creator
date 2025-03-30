@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
+import { ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ const Auth = () => {
           title: 'Welcome back!',
           description: 'You have successfully signed in.',
         });
-        navigate('/');
+        navigate('/dashboard');
       } else {
         const { error } = await signUp(email, password);
         if (error) throw error;
@@ -46,6 +47,10 @@ const Auth = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleGoBack = () => {
+    navigate('/');
   };
 
   return (
@@ -96,7 +101,7 @@ const Auth = () => {
           </Button>
         </form>
 
-        <div className="text-center mt-4">
+        <div className="text-center mt-4 space-y-4">
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
@@ -106,6 +111,16 @@ const Auth = () => {
               ? "Don't have an account? Sign up"
               : 'Already have an account? Sign in'}
           </button>
+          
+          <div>
+            <Button
+              variant="ghost"
+              onClick={handleGoBack}
+              className="text-sm text-muted-foreground flex items-center gap-1"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to home
+            </Button>
+          </div>
         </div>
       </div>
     </div>
