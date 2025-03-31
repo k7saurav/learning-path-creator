@@ -23,7 +23,7 @@ type LearningPathProps = {
   description: string;
   modules: LearningModule[];
   onModuleStatusChange: (moduleId: string, status: LearningModule['status']) => void;
-  isSaved?: boolean; // New prop to determine if the path is saved
+  isSaved?: boolean; // Prop to determine if the path is saved
   pathId?: string; // Path ID for local storage key
 };
 

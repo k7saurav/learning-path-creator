@@ -33,7 +33,12 @@ const Index = () => {
     }
     
     if (location.state?.selectedPath) {
-      setLearningPath(location.state.selectedPath);
+      const selectedPath = location.state.selectedPath;
+      // Ensure isSaved flag is set correctly
+      if (selectedPath.isSaved === undefined) {
+        selectedPath.isSaved = true;
+      }
+      setLearningPath(selectedPath);
       setIsPathSaved(true);
       // Clear the location state to avoid loading the same path on refresh
       window.history.replaceState({}, document.title);
@@ -63,6 +68,8 @@ const Index = () => {
         });
       }
       
+      // Explicitly set isSaved to false for newly generated paths
+      generatedPath.isSaved = false;
       setLearningPath(generatedPath);
       setIsPathSaved(false);
       toast({
@@ -91,6 +98,11 @@ const Index = () => {
         throw error;
       }
       
+      // Update the path with isSaved flag
+      setLearningPath({
+        ...learningPath,
+        isSaved: true
+      });
       setIsPathSaved(true);
       toast({
         title: "Success",
@@ -111,6 +123,7 @@ const Index = () => {
       const updatedModules = learningPath.modules.map((module) =>
         module.id === moduleId ? { ...module, status } : module
       );
+      
       setLearningPath({
         ...learningPath,
         modules: updatedModules,
@@ -169,7 +182,7 @@ const Index = () => {
               </Button>
               
               <div className="flex gap-4">
-                {user && !isPathSaved && (
+                {user && !learningPath.isSaved && !isPathSaved && (
                   <Button
                     onClick={handleSaveLearningPath}
                     variant="outline"
@@ -193,7 +206,7 @@ const Index = () => {
               description={learningPath.description}
               modules={learningPath.modules}
               onModuleStatusChange={handleModuleStatusChange}
-              isSaved={isPathSaved}
+              isSaved={learningPath.isSaved || isPathSaved}
               pathId={learningPath.id}
             />
           </section>
