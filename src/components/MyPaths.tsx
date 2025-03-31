@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Folder, Trash2 } from 'lucide-react';
@@ -23,9 +22,13 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 
+interface ExtendedLearningPath extends LearningPathType {
+  isSaved?: boolean;
+}
+
 type MyPathsProps = {
   paths: LearningPathType[] | null;
-  onSelectPath: (path: LearningPathType) => void;
+  onSelectPath: (path: ExtendedLearningPath) => void;
   onDeletePath: (pathId: string) => void;
   isLoading: boolean;
 };
@@ -50,7 +53,6 @@ const MyPaths: React.FC<MyPathsProps> = ({
     
     try {
       await onDeletePath(pathToDelete.id);
-      // Also clear local storage data for this path
       localStorage.removeItem(`learning-path-${pathToDelete.id}`);
       setDeleteDialogOpen(false);
       setPathToDelete(null);
@@ -65,11 +67,10 @@ const MyPaths: React.FC<MyPathsProps> = ({
   };
 
   const handleSelectPath = (path: LearningPathType) => {
-    // Mark the path as a saved path
     const pathWithSavedFlag = {
       ...path,
       isSaved: true
-    };
+    } as ExtendedLearningPath;
     onSelectPath(pathWithSavedFlag);
   };
 

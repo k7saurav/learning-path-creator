@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -16,17 +15,19 @@ import { saveLearningPath } from '@/lib/learningPathService';
 import { Button } from '@/components/ui/button';
 import { Folder, Save } from 'lucide-react';
 
+interface ExtendedLearningPath extends LearningPathType {
+  isSaved?: boolean;
+}
+
 const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [learningPath, setLearningPath] = useState<LearningPathType | null>(null);
+  const [learningPath, setLearningPath] = useState<ExtendedLearningPath | null>(null);
   const [isPathSaved, setIsPathSaved] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if we have a selected path from My Paths
   useEffect(() => {
-    // Redirect authenticated users to dashboard when coming to the index page directly
     if (user && location.pathname === '/' && !location.state?.selectedPath) {
       navigate('/dashboard');
       return;
@@ -34,13 +35,11 @@ const Index = () => {
     
     if (location.state?.selectedPath) {
       const selectedPath = location.state.selectedPath;
-      // Ensure isSaved flag is set correctly
       if (selectedPath.isSaved === undefined) {
         selectedPath.isSaved = true;
       }
       setLearningPath(selectedPath);
       setIsPathSaved(true);
-      // Clear the location state to avoid loading the same path on refresh
       window.history.replaceState({}, document.title);
     }
   }, [location.state, user, navigate, location.pathname]);
@@ -55,11 +54,9 @@ const Index = () => {
       let generatedPath;
       
       try {
-        // Try with the AI first
         generatedPath = await generateLearningPathWithAI(data);
       } catch (apiError) {
         console.error("API Error, using fallback:", apiError);
-        // If the API fails, use the fallback generator
         generatedPath = generateFallbackLearningPath(data);
         toast({
           title: "Using offline mode",
@@ -68,7 +65,6 @@ const Index = () => {
         });
       }
       
-      // Explicitly set isSaved to false for newly generated paths
       generatedPath.isSaved = false;
       setLearningPath(generatedPath);
       setIsPathSaved(false);
@@ -98,7 +94,6 @@ const Index = () => {
         throw error;
       }
       
-      // Update the path with isSaved flag
       setLearningPath({
         ...learningPath,
         isSaved: true
@@ -129,15 +124,9 @@ const Index = () => {
         modules: updatedModules,
       });
       
-      // If the path was previously saved and status changed, mark it as not saved
       if (isPathSaved) {
         setIsPathSaved(false);
       }
-      
-      toast({
-        title: "Progress updated",
-        description: `Module status changed to ${status}.`,
-      });
     }
   };
 
@@ -157,18 +146,15 @@ const Index = () => {
     navigate('/my-paths');
   };
 
-  // Render the dashboard content for authenticated users at /dashboard path
   const renderDashboardContent = () => {
     return (
       <>
-        {/* Learning Goal Form - show when no learning path is generated */}
         {!learningPath && (
           <section id="learning-goal-form" className="py-16 container">
             <LearningGoalForm onSubmit={handleGoalSubmit} isLoading={isGenerating} />
           </section>
         )}
         
-        {/* Learning Path Display - Show after generation */}
         {learningPath && (
           <section className="py-16 container">
             <div className="mb-8 flex justify-between">
@@ -220,19 +206,15 @@ const Index = () => {
       <Header />
       
       <main className="flex-1">
-        {/* For non-authenticated users or on the landing page, show the Hero section */}
         {(!user || location.pathname === '/') && !learningPath && (
           <Hero onGetStarted={handleGetStarted} />
         )}
         
-        {/* For authenticated users on the dashboard, show the dashboard content */}
         {(location.pathname === '/dashboard') && renderDashboardContent()}
         
-        {/* For viewing a path on the index page after authentication */}
         {user && location.pathname === '/' && learningPath && renderDashboardContent()}
       </main>
       
-      {/* Footer */}
       <footer className="border-t py-6 bg-background">
         <div className="container text-center text-muted-foreground">
           <p>© {new Date().getFullYear()} Learning Path Creator. All rights reserved.</p>
