@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Folder, Trash2 } from 'lucide-react';
@@ -53,7 +54,6 @@ const MyPaths: React.FC<MyPathsProps> = ({
     
     try {
       await onDeletePath(pathToDelete.id);
-      localStorage.removeItem(`learning-path-${pathToDelete.id}`);
       setDeleteDialogOpen(false);
       setPathToDelete(null);
     } catch (error) {

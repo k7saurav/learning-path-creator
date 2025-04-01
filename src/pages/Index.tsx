@@ -35,6 +35,8 @@ const Index = () => {
     
     if (location.state?.selectedPath) {
       const selectedPath = location.state.selectedPath;
+      console.log('Selected path from state:', selectedPath);
+      
       if (selectedPath.isSaved === undefined) {
         selectedPath.isSaved = true;
       }
@@ -115,6 +117,8 @@ const Index = () => {
 
   const handleModuleStatusChange = (moduleId: string, status: LearningModule['status']) => {
     if (learningPath) {
+      console.log(`Module status changing: moduleId=${moduleId}, status=${status}`);
+      
       const updatedModules = learningPath.modules.map((module) =>
         module.id === moduleId ? { ...module, status } : module
       );
@@ -123,10 +127,6 @@ const Index = () => {
         ...learningPath,
         modules: updatedModules,
       });
-      
-      if (isPathSaved) {
-        setIsPathSaved(false);
-      }
     }
   };
 

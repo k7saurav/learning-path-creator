@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CheckCircle, CircleEllipsis, Circle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { updateModuleStatus } from '@/lib/learningPathService';
+import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export type LearningModule = {
   id: string;
@@ -23,8 +26,8 @@ type LearningPathProps = {
   description: string;
   modules: LearningModule[];
   onModuleStatusChange: (moduleId: string, status: LearningModule['status']) => void;
-  isSaved?: boolean; // Prop to determine if the path is saved
-  pathId?: string; // Path ID for local storage key
+  isSaved?: boolean;
+  pathId?: string;
 };
 
 const StatusIcon = ({ status }: { status: LearningModule['status'] }) => {
@@ -59,39 +62,39 @@ const LearningPath: React.FC<LearningPathProps> = ({
   isSaved = false,
   pathId = '',
 }) => {
-  // Load module statuses from local storage on component mount
-  useEffect(() => {
+  const { user } = useAuth();
+
+  const handleModuleStatusChange = async (moduleId: string, status: LearningModule['status']) => {
+    // Call the parent component's handler
+    onModuleStatusChange(moduleId, status);
+    
+    // If the path is saved and we have a pathId, update the status in Supabase
     if (isSaved && pathId) {
-      const storageKey = `learning-path-${pathId}`;
-      const savedStatuses = localStorage.getItem(storageKey);
-      
-      if (savedStatuses) {
-        try {
-          const statusData = JSON.parse(savedStatuses);
-          // Update each module's status from local storage
-          for (const [moduleId, status] of Object.entries(statusData)) {
-            onModuleStatusChange(moduleId, status as LearningModule['status']);
-          }
-        } catch (error) {
-          console.error('Error loading module statuses from local storage:', error);
+      try {
+        console.log(`Saving module status to Supabase: moduleId=${moduleId}, status=${status}, pathId=${pathId}`);
+        
+        const { error } = await updateModuleStatus(pathId, moduleId, status);
+        
+        if (error) {
+          console.error('Failed to save module status to Supabase:', error);
+          toast({
+            title: 'Error',
+            description: 'Failed to save your progress. Please try again.',
+            variant: 'destructive',
+          });
+        } else {
+          console.log('Module status saved successfully to Supabase');
         }
+      } catch (error) {
+        console.error('Exception in handleModuleStatusChange:', error);
+        toast({
+          title: 'Error',
+          description: 'An unexpected error occurred while saving your progress.',
+          variant: 'destructive',
+        });
       }
     }
-  }, [isSaved, pathId, onModuleStatusChange]);
-
-  // Save module statuses to local storage when they change
-  useEffect(() => {
-    if (isSaved && pathId) {
-      const storageKey = `learning-path-${pathId}`;
-      const statusData: Record<string, LearningModule['status']> = {};
-      
-      modules.forEach(module => {
-        statusData[module.id] = module.status;
-      });
-      
-      localStorage.setItem(storageKey, JSON.stringify(statusData));
-    }
-  }, [modules, isSaved, pathId]);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -119,21 +122,21 @@ const LearningPath: React.FC<LearningPathProps> = ({
                   <Button
                     variant={module.status === 'not-started' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => onModuleStatusChange(module.id, 'not-started')}
+                    onClick={() => handleModuleStatusChange(module.id, 'not-started')}
                   >
                     Not Started
                   </Button>
                   <Button
                     variant={module.status === 'in-progress' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => onModuleStatusChange(module.id, 'in-progress')}
+                    onClick={() => handleModuleStatusChange(module.id, 'in-progress')}
                   >
                     In Progress
                   </Button>
                   <Button
                     variant={module.status === 'completed' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => onModuleStatusChange(module.id, 'completed')}
+                    onClick={() => handleModuleStatusChange(module.id, 'completed')}
                   >
                     Completed
                   </Button>

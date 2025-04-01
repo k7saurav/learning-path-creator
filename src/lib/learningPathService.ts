@@ -112,6 +112,60 @@ export async function deleteLearningPath(pathId: string) {
   }
 }
 
+// New function to update module status in the learning_paths table
+export async function updateModuleStatus(
+  pathId: string, 
+  moduleId: string, 
+  newStatus: 'not-started' | 'in-progress' | 'completed'
+) {
+  try {
+    console.log(`Updating module status: pathId=${pathId}, moduleId=${moduleId}, status=${newStatus}`);
+    
+    // First, get the current learning path data
+    const { data: pathData, error: getError } = await supabase
+      .from('learning_paths')
+      .select('modules')
+      .eq('id', pathId)
+      .single();
+    
+    if (getError) {
+      console.error('Error getting learning path for status update:', getError);
+      throw getError;
+    }
+    
+    if (!pathData?.modules) {
+      console.error('Learning path modules not found');
+      throw new Error('Learning path modules not found');
+    }
+    
+    // Update the module status in the modules array
+    const updatedModules = pathData.modules.map((module: any) => {
+      if (module.id === moduleId) {
+        return { ...module, status: newStatus };
+      }
+      return module;
+    });
+    
+    // Update the learning path with the new modules data
+    const { error: updateError } = await supabase
+      .from('learning_paths')
+      .update({ modules: updatedModules })
+      .eq('id', pathId);
+    
+    if (updateError) {
+      console.error('Error updating module status:', updateError);
+      throw updateError;
+    }
+    
+    console.log(`Module status updated successfully for module ${moduleId}`);
+    return { error: null, updatedModules };
+    
+  } catch (error) {
+    console.error('Error in updateModuleStatus:', error);
+    return { error, updatedModules: null };
+  }
+}
+
 // Modify the setupSupabaseRPC function to handle the case where the table already exists
 export async function setupSupabaseRPC() {
   try {
