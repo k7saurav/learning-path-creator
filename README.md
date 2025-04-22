@@ -1,69 +1,113 @@
-# Welcome to your Lovable project
+# Learning Path Creator
 
-## Project info
+An AI-powered web app that creates personalized learning paths based on users' goals, skill levels, and time availability. User can create profile using email and generate structured learning modules with resources using AI. Users can track their progress and saves multiple learning journeys.
 
-**URL**: https://lovable.dev/projects/265334de-13e3-4fbf-90ec-c7f790e25c61
+It is built with React and Tailwind CSS frontend, Supabase backend for authentication and data storage, and Google's Gemini AI API.
 
-## How can I edit this code?
+## [YOUR INPUT NEEDED: App Screenshot/GIF]
+<!-- Add a screenshot or GIF of your application here to give visitors a quick visual understanding of your project -->
 
-There are several ways of editing your application.
+## [YOUR INPUT NEEDED: Live Demo]
+<!-- If your application is deployed, add the link here -->
 
-**Use Lovable**
+## Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/265334de-13e3-4fbf-90ec-c7f790e25c61) and start prompting.
+- **AI-Generated Learning Paths**: Create tailored learning paths with detailed modules and resources based on your goals, skill level, and available time
+- **User Authentication**: Secure email-based login and registration
+- **Progress Tracking**: Mark modules as "Not Started," "In Progress," or "Completed"
+- **Path Management**: Save, view, and delete multiple learning paths
+- **Responsive Design**: Fully functional on both desktop and mobile devices
 
-Changes made via Lovable will be committed automatically to this repo.
+## Technology Stack
 
-**Use your preferred IDE**
+- **Frontend**:
+  - React with TypeScript
+  - Tailwind CSS for styling
+  - shadcn/ui component library
+  - React Router v6 for navigation
+  - React Query for data fetching and caching
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Backend**:
+  - Supabase for authentication and database
+  - PostgreSQL database (via Supabase)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **AI Integration**:
+  - Google Gemini API for learning path generation
 
-Follow these steps:
+## Installation and Setup
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Prerequisites
+- Node.js (v14.0.0 or later)
+- npm or yarn
+- Supabase account
+- Google Gemini API key
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Installation Steps
 
-# Step 3: Install the necessary dependencies.
-npm i
+1. Clone the repository
+   ```bash
+   git clone [YOUR INPUT NEEDED: your-repo-url]
+   cd learning-path-creator
+2. Install dependencies
+   ```bash
+   npm install
+3. Set up environment variables
+   ```bash
+   Create a .env file in the root directory
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+   Add the following variables:
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_GEMINI_API_KEY=your_gemini_api_key
+4. Run the development server
+   ```bash
+   npm run dev
+5. Open http://localhost:5173 with your browser to see the result.
+
+## How to Use the Web App
+
+### Creating an Account
+1. Navigate to the application
+2. Click on "Sign Up" in the navigation menu
+3. Enter your email and create a password
+
+### Creating a Learning Path
+1. Log in to your account
+2. On the dashboard, fill out the learning goal form:
+   * Enter your learning goal
+   * Select your current skill level
+   * Choose your time availability
+3. Click "Generate Learning Path"
+4. Review the AI-generated learning path with its modules and resources
+5. Save it for tracking the progress
+
+### Tracking Progress
+
+1. For each module in your learning path, you can mark it as:
+   * Not Started (default)
+   * In Progress
+   * Completed
+2. The app will save your progress automatically
+
+### Managing Multiple Paths
+1. Save your current path by clicking "Save Path"
+2. View all your saved paths by clicking "View My Paths"
+3. Select any saved path to view details or continue learning
+4. Delete paths you no longer need
+
+## Project Structure
+
+```
+src/
+├── components/         # UI components
+├── contexts/           # React contexts for state management
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions and API services
+├── pages/              # Application pages/routes
+└── ...
 ```
 
-**Edit a file directly in GitHub**
+## Future Enhancements
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Credits and Acknowledgments
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/265334de-13e3-4fbf-90ec-c7f790e25c61) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
