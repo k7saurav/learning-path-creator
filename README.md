@@ -4,10 +4,10 @@ An AI-powered web app that creates personalized learning paths based on users' g
 
 It is built with React and Tailwind CSS frontend, Supabase backend for authentication and data storage, and Google's Gemini AI API.
 
-## [YOUR INPUT NEEDED: App Screenshot/GIF]
-<!-- Add a screenshot or GIF of your application here to give visitors a quick visual understanding of your project -->
+## [App Screenshot/GIF]
+<!-- Add a screenshot or GIF of the application here -->
 
-## [YOUR INPUT NEEDED: Live Demo]
+## [Live Demo]
 <!-- If your application is deployed, add the link here -->
 
 ## Features
