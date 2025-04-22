@@ -25,7 +25,7 @@ User can view and manage thier saved path here.
 On this page, user can track their learing progress and mark a module as Started or In Progress or Completed.
 
 ## [Live Demo]
-<!-- If your application is deployed, add the link here -->
+URL: https://learning-path-creator.vercel.app/
 
 ## Features
 
